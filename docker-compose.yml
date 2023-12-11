@@ -3,7 +3,7 @@ version: '3.8'
 services:
   tapis-api:
     image: tapis-api:1.0.0
-    container_name: tapis_ap
+    container_name: tapis_api
     restart: always
     command: npm run start:dev
     build:
@@ -11,6 +11,6 @@ services:
       target: development
       dockerfile: dockerfile
     ports:
-      - 4005:4005
+      - 12501:12501
     env_file:
       - .env
