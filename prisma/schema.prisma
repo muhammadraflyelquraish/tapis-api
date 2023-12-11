@@ -11,16 +11,21 @@ model Tapis {
   id          String       @id @default(uuid())
   name        String
   description String       @db.Text
+  thumbnail   String       @db.Text
   images      TapisImage[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@index([name, description])
 }
 
 model TapisImage {
   id        String   @id @default(uuid())
   imageUrl  String   @db.Text
-  tapis     Tapis?   @relation(fields: [tapisId], references: [id])
-  tapisId   String?
+  tapis     Tapis    @relation(fields: [tapisId], references: [id])
+  tapisId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([tapisId])
 }

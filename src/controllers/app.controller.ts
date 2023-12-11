@@ -7,7 +7,8 @@ export class AppController {
   @Get()
   async getHello() {
     return {
-      message: 'Hello',
+      message: 'Hello folks, welcome to API DEKAT (Deteksi Kain Tapis)',
+      version: 1,
     };
   }
 }
