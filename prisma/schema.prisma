@@ -8,15 +8,17 @@ datasource db {
 }
 
 model Tapis {
-  id          String       @id @default(uuid())
-  name        String
-  description String       @db.Text
-  thumbnail   String       @db.Text
-  images      TapisImage[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id            String       @id @default(uuid())
+  name          String
+  utility       String       @db.Text
+  signification String       @db.Text
+  description   String       @db.Text
+  thumbnail     String       @db.Text
+  images        TapisImage[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-  @@index([name, description])
+  @@index([name, utility, signification, description])
 }
 
 model TapisImage {
@@ -28,4 +30,13 @@ model TapisImage {
   updatedAt DateTime @updatedAt
 
   @@index([tapisId])
+}
+
+model TapisArea {
+  id        String   @id @default(uuid())
+  storeName String
+  longitude Float
+  latitude  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
