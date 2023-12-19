@@ -6,6 +6,8 @@ export class GetTapisDto {
 
 export class CreateTapisDto {
   name: string;
+  utility: string;
+  signification: string;
   description: string;
   thumbnail: string;
   images: Array<string>;
