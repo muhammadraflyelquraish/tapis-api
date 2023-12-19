@@ -216,9 +216,9 @@ export class TapisController {
 
     const predictions = (tfliteModel as any).predict(reshapedImage);
     const outputImage = predictions.squeeze();
-    const outputBuffer = await tf.node.encodePng(outputImage);
-    console.log(outputBuffer);
+    // const outputBuffer = await tf.node.encodePng(outputImage);
+    // console.log(outputBuffer);
 
-    return outputBuffer;
+    return outputImage;
   }
 }
