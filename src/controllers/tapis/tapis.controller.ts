@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Express } from 'express';
 import {
   BadRequestException,
@@ -18,8 +19,7 @@ import { PrismaService } from 'src/services/prisma.service';
 import { GetTapisDto, CreateTapisDto, CreateTapisImageDto } from './tapis.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 // import { AuthGuard } from 'src/guards/auth.guard';
-import * as tf from '@tensorflow/tfjs-node';
-import * as tflite from 'tfjs-tflite-node';
+import { Tapis } from '@prisma/client';
 
 @Controller('tapis')
 // @UseGuards(AuthGuard)
@@ -202,23 +202,45 @@ export class TapisController {
   @UseInterceptors(FileInterceptor('image'))
   async scanTapis(@UploadedFile() file: Express.Multer.File) {
     /**
-     * @todo: scan kain tapis here
+     * @todo: to base64 image
      *
      */
-    const modelPath =
-      '/Users/muhammadrafly/Downloads/PERSONAL/Capstone/tapis-api/models/model.tflite';
-    const tfliteModel = await tflite.loadTFLiteModel(modelPath);
+    const base64Image = file.buffer.toString('base64');
 
-    const image = tf.node.decodeImage(file.buffer);
-    const resizedImage = tf.image.resizeBilinear(image, [240, 240]);
-    const normalizedImage = resizedImage.toFloat().div(tf.scalar(255));
-    const reshapedImage = normalizedImage.expandDims(0); // Ensure the correct shape with an extra dimension
+    // /**
+    //  * @todo: predict image
+    //  *
+    //  */
+    const url = process.env.TAPIS_DETECTION_API + '/scan/';
+    const modelPredict = await axios.post(url, {
+      model_url: process.env.MODEL_URL,
+      base64: base64Image,
+    });
 
-    const predictions = (tfliteModel as any).predict(reshapedImage);
-    const outputImage = predictions.squeeze();
-    // const outputBuffer = await tf.node.encodePng(outputImage);
-    // console.log(outputBuffer);
+    if (!modelPredict) {
+      throw new BadRequestException('Image not supported');
+    }
 
-    return outputImage;
+    /**
+     * @todo: load existing tapis info
+     *
+     */
+    let tapis: Tapis[];
+    const tapisName = modelPredict.data.predict;
+    if (tapisName) {
+      tapis = await this.prisma.tapis.findMany({
+        where: {
+          name: {
+            contains: tapisName,
+            mode: 'insensitive',
+          },
+        },
+      });
+    }
+    return {
+      tapisId: tapis.length > 0 ? tapis[0].id : '',
+      tapisName: tapisName,
+      tapisImage: tapis.length > 0 ? tapis[0].thumbnail : '',
+    };
   }
 }
