@@ -1,6 +1,7 @@
 # key
 .env
 firebase.json
+app.yaml
 
 # compiled output
 /dist
